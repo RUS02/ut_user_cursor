@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Создание пользователей</title>
+    <style>
+        body { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+        #log { height: 300px; overflow-y: scroll; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <h2>Подключение к базе данных</h2>
+        <input type="text" id="db_login" placeholder="Логин">
+        <input type="password" id="db_password" placeholder="Пароль">
+        <button onclick="connectToDb()">Подключиться</button>
+    </div>
+
+    <div class="section">
+        <h2>Создание пользователей</h2>
+        <textarea id="emails" rows="5" placeholder="Введите email адреса (по одному на строку)"></textarea>
+        <button onclick="createUsers()">Создать пользователей</button>
+    </div>
+
+    <div class="section">
+        <h2>Лог операций</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += message + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function connectToDb() {
+            const response = await fetch('/connect', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    login: document.getElementById('db_login').value,
+                    password: document.getElementById('db_password').value
+                })
+            });
+            const data = await response.json();
+            log(data.message);
+        }
+
+        async function createUsers() {
+            const response = await fetch('/create_users', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    emails: document.getElementById('emails').value
+                })
+            });
+            const data = await response.json();
+            data.messages.forEach(message => log(message));
+        }
+    </script>
+</body>
+</html> 
